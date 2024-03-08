@@ -12,7 +12,7 @@ class UserFactory(SQLAlchemyModelFactory):
         model = User
         sqlalchemy_session_persistence = "commit"
 
-    id = Sequence(lambda n: n)
+    id = Sequence(lambda n: n + 1)
     username = Faker("first_name")
     full_name = Faker("name")
     email = Sequence(lambda n: f"email{n}@test.com")

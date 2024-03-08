@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.core import database
-from app.endpoints import auth_router
+from app.endpoints import auth_router, ecg_router
 
 
 def create_app() -> FastAPI:
@@ -19,5 +19,6 @@ def create_app() -> FastAPI:
     )
 
     app.include_router(auth_router)
+    app.include_router(ecg_router)
 
     return app
