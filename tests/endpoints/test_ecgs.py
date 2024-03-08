@@ -2,6 +2,7 @@ import pytest
 from fastapi.testclient import TestClient
 
 from tests.factories.ecg import EcgFactory
+from tests.factories.insight import InsightFactory
 
 
 @pytest.mark.usefixtures("authenticate_user")
@@ -22,6 +23,17 @@ def test_get_ecg(client: TestClient):
 
     assert response.status_code == 200
     assert response.json()["id"] == ecg.id
+
+
+@pytest.mark.usefixtures("authenticate_user")
+def test_get_ecg_insights(client: TestClient):
+    ecg = EcgFactory.create(insights=[])
+    InsightFactory.create_batch(5, ecg=ecg)
+
+    response = client.get(f"/ecgs/{ecg.id}/insights")
+
+    assert response.status_code == 200
+    assert len(response.json()) == 5
 
 
 @pytest.mark.usefixtures("authenticate_user")

@@ -17,3 +17,7 @@ class EcgFactory(SQLAlchemyModelFactory):
     leads = RelatedFactoryList(
         "tests.factories.lead.LeadFactory", size=12, factory_related_name="ecg"
     )
+
+    insights = RelatedFactoryList(
+        "tests.factories.insight.InsightFactory", size=5, factory_related_name="ecg"
+    )
