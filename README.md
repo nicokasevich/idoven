@@ -4,6 +4,12 @@
 docker compose up -d
 ```
 
+### Seed admin user
+
+```
+source seed.sh
+```
+
 ### Usage
 
 You can access the API on the following URL:
