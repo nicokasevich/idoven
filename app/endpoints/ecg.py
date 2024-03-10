@@ -14,27 +14,39 @@ router = APIRouter(tags=["ECG"])
 
 @router.get("/ecgs", response_model=list[EcgItem])
 def get_ecgs(
-    _: User = Depends(get_current_user), ecg_repository: EcgRepository = Depends()
+    current_user: User = Depends(get_current_user),
+    ecg_repository: EcgRepository = Depends(),
 ):
-    return ecg_repository.all()
+    return ecg_repository.all_by_user(current_user.id)
 
 
 @router.get("/ecgs/{id}", response_model=EcgItem)
 def get_ecg(
     id: int,
-    _: User = Depends(get_current_user),
+    current_user: User = Depends(get_current_user),
     ecg_repository: EcgRepository = Depends(),
 ):
-    return ecg_repository.get(id)
+    ecg = ecg_repository.get(id)
+
+    if current_user.id != ecg.user_id:
+        raise HTTPException(status_code=403, detail="Not enough permissions")
+
+    if not ecg:
+        raise HTTPException(status_code=404, detail="Ecg not found")
+
+    return ecg
 
 
 @router.get("/ecgs/{ecg_id}/insights", response_model=Optional[InsightItem])
 def get_ecg_insights(
     ecg_id: int,
-    _: User = Depends(get_current_user),
+    current_user: User = Depends(get_current_user),
     ecg_repository: EcgRepository = Depends(),
 ):
     ecg = ecg_repository.get(ecg_id)
+
+    if current_user.id != ecg.user_id:
+        raise HTTPException(status_code=403, detail="Not enough permissions")
 
     if not ecg:
         raise HTTPException(status_code=404, detail="Ecg not found")
@@ -45,12 +57,11 @@ def get_ecg_insights(
 @router.post("/ecgs", response_model=EcgItem)
 def create_ecg(
     request: EcgCreate,
-    _: User = Depends(get_current_user),
+    current_user: User = Depends(get_current_user),
     ecg_repository: EcgRepository = Depends(),
 ):
-    ecg = ecg_repository.create(request)
+    ecg = ecg_repository.create(request, user_id=current_user.id)
 
     on_ecg_create.delay(ecg.id)
 
-    return ecg
     return ecg

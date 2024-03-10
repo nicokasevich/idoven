@@ -4,10 +4,11 @@ import pytest
 from fastapi.testclient import TestClient
 
 from tests.factories.ecg import EcgFactory
+from tests.factories.user import UserFactory
 
 
-@pytest.mark.usefixtures("authenticate_user")
-def test_get_ecgs(client: TestClient):
+def test_get_ecgs(client: TestClient, authenticate_user):
+    EcgFactory.create_batch(10, user=authenticate_user)
     EcgFactory.create_batch(10)
 
     response = client.get("/ecgs")
@@ -16,9 +17,8 @@ def test_get_ecgs(client: TestClient):
     assert len(response.json()) == 10
 
 
-@pytest.mark.usefixtures("authenticate_user")
-def test_get_ecg(client: TestClient):
-    ecg = EcgFactory.create()
+def test_get_ecg(client: TestClient, authenticate_user):
+    ecg = EcgFactory.create(user=authenticate_user)
 
     response = client.get(f"/ecgs/{ecg.id}")
 
@@ -27,13 +27,32 @@ def test_get_ecg(client: TestClient):
 
 
 @pytest.mark.usefixtures("authenticate_user")
-def test_get_ecg_insights(client: TestClient):
-    ecg = EcgFactory.create()
+def test_can_not_get_ecg_from_another_user(client: TestClient):
+    user = UserFactory.create()
+    ecg = EcgFactory.create(user=user)
+
+    response = client.get(f"/ecgs/{ecg.id}")
+
+    assert response.status_code == 403
+
+
+def test_get_ecg_insights(client: TestClient, authenticate_user):
+    ecg = EcgFactory.create(user=authenticate_user)
 
     response = client.get(f"/ecgs/{ecg.id}/insights")
 
     assert response.status_code == 200
     assert response.json()["id"] == ecg.insight.id
+
+
+@pytest.mark.usefixtures("authenticate_user")
+def test_can_not_get_ecg_insights_from_another_user(client: TestClient):
+    user = UserFactory.create()
+    ecg = EcgFactory.create(user=user)
+
+    response = client.get(f"/ecgs/{ecg.id}/insights")
+
+    assert response.status_code == 403
 
 
 @pytest.mark.usefixtures("authenticate_user")

@@ -1,6 +1,12 @@
 from datetime import datetime
 
-from factory import LazyFunction, RelatedFactoryList, Sequence, post_generation
+from factory import (
+    LazyFunction,
+    RelatedFactoryList,
+    Sequence,
+    SubFactory,
+    post_generation,
+)
 from factory.alchemy import SQLAlchemyModelFactory
 
 from app.models.ecg import Ecg
@@ -14,6 +20,8 @@ class EcgFactory(SQLAlchemyModelFactory):
 
     id = Sequence(lambda n: n + 1)
     created_at = LazyFunction(datetime.now)
+
+    user = SubFactory("tests.factories.user.UserFactory")
 
     leads = RelatedFactoryList(
         "tests.factories.lead.LeadFactory", size=12, factory_related_name="ecg"
