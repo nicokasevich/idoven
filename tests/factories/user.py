@@ -19,3 +19,4 @@ class UserFactory(SQLAlchemyModelFactory):
     password = get_password_hash("password")
     created_at = LazyFunction(datetime.now)
     updated_at = LazyFunction(datetime.now)
+    role = "user"
