@@ -1,0 +1,74 @@
+version: '3'
+
+services:
+  broker:
+    image: redis:alpine
+    restart: always
+    ports:
+      - "6379:6379"
+      
+  db:
+    image: postgres:16.2-alpine3.19
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: example
+      POSTGRES_DB: idoven
+    ports:
+      - "5432:5432"
+    volumes:
+      - db-data:/var/lib/postgresql/data
+
+  pgadmin:
+    image: dpage/pgadmin4
+    restart: always
+    environment:
+      PGADMIN_DEFAULT_EMAIL: test@admin.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    ports:
+      - "5050:80"
+    depends_on:
+      - db
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: uvicorn main:create_app --factory --reload --host 0.0.0.0
+    restart: always
+    ports:
+      - "8001:8000"
+    depends_on:
+      - db
+      - broker
+    volumes:
+      - .:/app
+
+  worker:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: celery -A worker.actions worker --loglevel=info
+    restart: always
+    depends_on:
+      - db
+      - broker
+    volumes:
+      - .:/app
+
+  flower:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: celery -A worker.actions flower --port=5555
+    restart: always
+    ports:
+      - "5555:5555"
+    depends_on:
+      - db
+      - broker
+    volumes:
+      - .:/app
+  
+volumes:
+  db-data:

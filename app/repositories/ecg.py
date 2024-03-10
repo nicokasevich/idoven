@@ -27,3 +27,9 @@ class EcgRepository:
         self.db.commit()
         self.db.refresh(ecg)
         return ecg
+
+    def update(self, ecg: Ecg) -> Ecg:
+        self.db.add(ecg)
+        self.db.commit()
+        self.db.refresh(ecg)
+        return ecg

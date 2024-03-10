@@ -5,6 +5,7 @@ from app.models.user import User
 from app.repositories.ecg import EcgRepository
 from app.schemas.ecg import EcgCreate, EcgItem
 from app.schemas.insight import InsightItem
+from worker.actions import on_ecg_create
 
 router = APIRouter(tags=["ECG"])
 
@@ -45,4 +46,8 @@ def create_ecg(
     _: User = Depends(get_current_user),
     ecg_repository: EcgRepository = Depends(),
 ):
-    return ecg_repository.create(request)
+    ecg = ecg_repository.create(request)
+
+    on_ecg_create.delay(ecg.id)
+
+    return ecg
