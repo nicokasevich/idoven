@@ -21,7 +21,14 @@ def login(
 
 
 @router.post("/register", response_model=UserItem)
-def register(request: UserRegister, user_repository: UserRepository = Depends()):
+def register(
+    request: UserRegister,
+    current_user: User = Depends(get_current_user),
+    user_repository: UserRepository = Depends(),
+):
+    if current_user.role != "admin":
+        raise HTTPException(status_code=403, detail="Not enough permissions")
+
     if user_repository.get_by_username(request.username):
         raise HTTPException(status_code=400, detail="Username already exists")
 

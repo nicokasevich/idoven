@@ -1,8 +1,10 @@
+import pytest
 from fastapi.testclient import TestClient
 
 from tests.factories.user import UserFactory
 
 
+@pytest.mark.usefixtures("authenticate_as_admin")
 def test_user_can_register(client: TestClient):
     response = client.post(
         "/auth/register",
@@ -22,6 +24,22 @@ def test_user_can_register(client: TestClient):
     }
 
 
+@pytest.mark.usefixtures("authenticate_as_user")
+def test_user_can_not_register(client: TestClient):
+    response = client.post(
+        "/auth/register",
+        json={
+            "username": "name",
+            "email": "email@example.com",
+            "full_name": "lastname",
+            "password": "password",
+        },
+    )
+
+    assert response.status_code == 403
+
+
+@pytest.mark.usefixtures("authenticate_as_admin")
 def test_user_can_not_register_with_existing_email(client: TestClient):
     user = UserFactory()
 
@@ -39,6 +57,7 @@ def test_user_can_not_register_with_existing_email(client: TestClient):
     assert response.json() == {"detail": "Email already exists"}
 
 
+@pytest.mark.usefixtures("authenticate_as_admin")
 def test_user_can_not_register_with_existing_username(client: TestClient):
     user = UserFactory(email="email2@test.com")
 

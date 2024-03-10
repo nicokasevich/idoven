@@ -50,7 +50,14 @@ def client(app: FastAPI):
 
 
 @pytest.fixture
-def authenticate_user(app: FastAPI):
+def authenticate_as_user(app: FastAPI):
     user = UserFactory()
+    app.dependency_overrides[get_current_user] = lambda: user
+    return user
+
+
+@pytest.fixture
+def authenticate_as_admin(app: FastAPI):
+    user = UserFactory(role="admin")
     app.dependency_overrides[get_current_user] = lambda: user
     return user

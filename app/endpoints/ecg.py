@@ -17,6 +17,9 @@ def get_ecgs(
     current_user: User = Depends(get_current_user),
     ecg_repository: EcgRepository = Depends(),
 ):
+    if current_user.role != "user":
+        raise HTTPException(status_code=403, detail="Not enough permissions")
+
     return ecg_repository.all_by_user(current_user.id)
 
 
@@ -26,6 +29,9 @@ def get_ecg(
     current_user: User = Depends(get_current_user),
     ecg_repository: EcgRepository = Depends(),
 ):
+    if current_user.role != "user":
+        raise HTTPException(status_code=403, detail="Not enough permissions")
+
     ecg = ecg_repository.get(id)
 
     if current_user.id != ecg.user_id:
@@ -43,6 +49,9 @@ def get_ecg_insights(
     current_user: User = Depends(get_current_user),
     ecg_repository: EcgRepository = Depends(),
 ):
+    if current_user.role != "user":
+        raise HTTPException(status_code=403, detail="Not enough permissions")
+
     ecg = ecg_repository.get(ecg_id)
 
     if current_user.id != ecg.user_id:
@@ -60,6 +69,9 @@ def create_ecg(
     current_user: User = Depends(get_current_user),
     ecg_repository: EcgRepository = Depends(),
 ):
+    if current_user.role != "user":
+        raise HTTPException(status_code=403, detail="Not enough permissions")
+
     ecg = ecg_repository.create(request, user_id=current_user.id)
 
     on_ecg_create.delay(ecg.id)
