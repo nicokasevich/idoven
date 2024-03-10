@@ -25,6 +25,7 @@ def generate_zero_crossings(ecg_id: int) -> Ecg:
         count = count_zero_crossings(lead.signal)
         zero_crossings.append({"count": count, "channel": lead.name})
 
-    ecg.insight.append(Insight(ecg_id=ecg.id, zero_crossings=zero_crossings))
+    if not ecg.insight:
+        ecg.insight = Insight(ecg_id=ecg.id, zero_crossings=zero_crossings)
 
     return ecg_repository.update(ecg)

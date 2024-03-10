@@ -5,8 +5,9 @@ from sqlalchemy import StaticPool, create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.orm.session import Session
 
-from app.core.database import Base, get_db
+from app.core.database import get_db
 from app.core.security import get_current_user
+from app.models.base import Base
 from main import create_app
 from tests.factories import sqlalchemy_factories
 from tests.factories.user import UserFactory

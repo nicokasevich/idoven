@@ -23,6 +23,7 @@ psycopg2-binary = "^2.9.9"
 flower = "^2.0.1"
 numpy = "^1.26.4"
 psycopg2 = "^2.9.9"
+alembic = "^1.13.1"
 
 
 [tool.poetry.group.dev.dependencies]

@@ -1,3 +1,5 @@
+from typing import Optional
+
 from fastapi import APIRouter, Depends, HTTPException
 
 from app.core.security import get_current_user
@@ -26,7 +28,7 @@ def get_ecg(
     return ecg_repository.get(id)
 
 
-@router.get("/ecgs/{ecg_id}/insights", response_model=InsightItem)
+@router.get("/ecgs/{ecg_id}/insights", response_model=Optional[InsightItem])
 def get_ecg_insights(
     ecg_id: int,
     _: User = Depends(get_current_user),
@@ -50,4 +52,5 @@ def create_ecg(
 
     on_ecg_create.delay(ecg.id)
 
+    return ecg
     return ecg

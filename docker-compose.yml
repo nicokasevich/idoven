@@ -34,7 +34,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    command: uvicorn main:create_app --factory --reload --host 0.0.0.0
+    command: sh -c "alembic upgrade head && uvicorn main:create_app --factory --reload --host 0.0.0.0"
     restart: always
     ports:
       - "8001:8000"
