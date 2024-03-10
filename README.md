@@ -6,6 +6,9 @@ docker compose up -d
 
 ### Seed admin user
 
+- **username**: admin
+- **password**: password
+
 ```
 source seed.sh
 ```
