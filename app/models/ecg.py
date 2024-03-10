@@ -18,7 +18,8 @@ class Ecg(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
 
     leads: Mapped[list["Lead"]] = relationship(back_populates="ecg")
-    insights: Mapped[list["Insight"]] = relationship(back_populates="ecg")
+
+    insight: Mapped["Insight"] = relationship(back_populates="ecg", uselist=False)
 
     def __repr__(self) -> str:
         return f"<Ecg {self.id}>"

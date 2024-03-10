@@ -26,7 +26,7 @@ def get_ecg(
     return ecg_repository.get(id)
 
 
-@router.get("/ecgs/{ecg_id}/insights", response_model=list[InsightItem])
+@router.get("/ecgs/{ecg_id}/insights", response_model=InsightItem)
 def get_ecg_insights(
     ecg_id: int,
     _: User = Depends(get_current_user),
@@ -37,7 +37,7 @@ def get_ecg_insights(
     if not ecg:
         raise HTTPException(status_code=404, detail="Ecg not found")
 
-    return ecg.insights
+    return ecg.insight
 
 
 @router.post("/ecgs", response_model=EcgItem)

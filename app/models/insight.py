@@ -18,7 +18,7 @@ class Insight(Base):
     zero_crossings: Mapped[list[ZeroCrossingItem]] = mapped_column(JSON, default=list)
 
     ecg_id: Mapped[int] = mapped_column(Integer, ForeignKey("ecgs.id"), index=True)
-    ecg: Mapped["Ecg"] = relationship(back_populates="insights")
+    ecg: Mapped["Ecg"] = relationship(back_populates="insight")
 
     def __repr__(self) -> str:
         return f"<Insight {self.id}>"

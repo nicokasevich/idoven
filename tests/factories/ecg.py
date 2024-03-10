@@ -1,9 +1,10 @@
 from datetime import datetime
 
-from factory import LazyFunction, RelatedFactoryList, Sequence
+from factory import LazyFunction, RelatedFactoryList, Sequence, post_generation
 from factory.alchemy import SQLAlchemyModelFactory
 
 from app.models.ecg import Ecg
+from tests.factories.insight import InsightFactory
 
 
 class EcgFactory(SQLAlchemyModelFactory):
@@ -18,6 +19,6 @@ class EcgFactory(SQLAlchemyModelFactory):
         "tests.factories.lead.LeadFactory", size=12, factory_related_name="ecg"
     )
 
-    insights = RelatedFactoryList(
-        "tests.factories.insight.InsightFactory", size=5, factory_related_name="ecg"
-    )
+    @post_generation
+    def insight(self, *args, **kwargs):
+        InsightFactory(ecg=self)

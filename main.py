@@ -1,13 +1,10 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.core import database
 from app.endpoints import auth_router, ecg_router
 
 
 def create_app() -> FastAPI:
-    database.Base.metadata.create_all(bind=database.engine)
-
     app = FastAPI()
 
     app.add_middleware(

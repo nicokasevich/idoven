@@ -6,16 +6,25 @@ from app.models.insight import Insight
 from app.repositories.ecg import EcgRepository
 
 
-def calculate_zero_crossings(ecg_id: int) -> Ecg:
+def count_zero_crossings(sequence: list) -> int:
+    """Counts the number of zero crossings in a sequence."""
+
+    signal = np.array(sequence) > 0
+    return len((signal[:-1] ^ signal[1:]).nonzero()[0])
+
+
+def generate_zero_crossings(ecg_id: int) -> Ecg:
+    """Appends zero crossings to the ecg insights. And returns the updated ecg."""
+
     db = SessionLocal()
     ecg_repository = EcgRepository(db)
     ecg = ecg_repository.get(ecg_id)
 
     zero_crossings = []
     for lead in ecg.leads:
-        signal = np.array(lead.signal) > 0
-        count = len((signal[:-1] ^ signal[1:]).nonzero()[0])
+        count = count_zero_crossings(lead.signal)
         zero_crossings.append({"count": count, "channel": lead.name})
-        ecg.insights.append(Insight(ecg_id=ecg.id, zero_crossings=zero_crossings))
+
+    ecg.insight.append(Insight(ecg_id=ecg.id, zero_crossings=zero_crossings))
 
     return ecg_repository.update(ecg)

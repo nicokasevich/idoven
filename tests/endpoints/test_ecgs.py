@@ -1,8 +1,9 @@
+from unittest.mock import patch
+
 import pytest
 from fastapi.testclient import TestClient
 
 from tests.factories.ecg import EcgFactory
-from tests.factories.insight import InsightFactory
 
 
 @pytest.mark.usefixtures("authenticate_user")
@@ -27,17 +28,17 @@ def test_get_ecg(client: TestClient):
 
 @pytest.mark.usefixtures("authenticate_user")
 def test_get_ecg_insights(client: TestClient):
-    ecg = EcgFactory.create(insights=[])
-    InsightFactory.create_batch(5, ecg=ecg)
+    ecg = EcgFactory.create()
 
     response = client.get(f"/ecgs/{ecg.id}/insights")
 
     assert response.status_code == 200
-    assert len(response.json()) == 5
+    assert response.json()["id"] == ecg.insight.id
 
 
 @pytest.mark.usefixtures("authenticate_user")
-def test_create_ecg(client: TestClient):
+@patch("app.endpoints.ecg.on_ecg_create.delay")
+def test_create_ecg(mock_on_ecg_create, client: TestClient):
     data = {
         "leads": [
             {
@@ -50,4 +51,5 @@ def test_create_ecg(client: TestClient):
 
     response = client.post("/ecgs", json=data)
 
+    mock_on_ecg_create.assert_called_with(response.json()["id"])
     assert response.status_code == 200
