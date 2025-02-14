@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "idoven"
-version = "0.1.0"
+version = "2.0.0"
 description = "Idoven backend challenge"
 authors = ["Nicolas Kasevich <n.kasevich@gmail.com>"]
 readme = "README.md"
